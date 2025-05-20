@@ -86,7 +86,7 @@ const jobSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'deposit_paid', 'in_progress', 'completed', 'review', 'revision_requested', 'revision_in_progress', 'revision_completed', 'approved_by_client', 'final_paid', 'job_end'],
+    enum: ['pending', 'approved', 'deposit_paid', 'in_progress', 'completed', 'final_paid', 'review', 'revision_requested', 'revision_in_progress', 'revision_completed', 'approved_by_client', 'job_end'],
     default: 'pending' // Keep as pending so admin can review
   },
   paymentStatus: {

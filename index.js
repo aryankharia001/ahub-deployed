@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
@@ -26,7 +27,7 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-  origin: ['https://ahub-deployed.onrender.com', 'http://localhost:5173'],
+  origin: 'http://localhost:5173',
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -38,6 +39,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Logging middleware
+// if (process.env.NODE_ENV === 'development') {
+//   app.use(morgan('dev'));
+// } else {
+//   app.use(morgan('combined'));
+// }
 
 // Rate limiting
 const limiter = rateLimit({
@@ -59,6 +67,7 @@ app.use('/api/auth/register', authLimiter);
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);  // Added job routes
+// app.use('/api/');  // Added job routes
 // app.use('/api/users', userRoutes);
 
 // Health check route
@@ -71,8 +80,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Root route
-app.get('/api', (req, res) => {
+// Root route
+app.get('/', (req, res) => {
   res.json({
     message: 'ahub API Server',
     version: '1.0.0',
@@ -84,17 +93,8 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
-// 404 handler for API routes
-app.use('/api/*', (req, res, next) => {
+// 404 handler
+app.use((req, res, next) => {
   const error = new Error(`Not Found - ${req.originalUrl}`);
   res.status(404);
   next(error);
@@ -124,20 +124,10 @@ mongoose.connect(process.env.MONGODB_URI, {
   
   // Start server after database connection
   const PORT = process.env.PORT || 5000;
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
-    console.log(`📡 API available at http://localhost:${PORT}/api`);
-    console.log(`🌐 Frontend served at http://localhost:${PORT}`);
+  app.listen(PORT, () => {
+    // console.log(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    console.log(`📡 API available at http://localhost:${PORT}`);
   });
-
-  // Handle SIGTERM
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM received. Shutting down gracefully');
-    server.close(() => {
-      console.log('Process terminated');
-    });
-  });
-
 })
 .catch((error) => {
   console.error('❌ MongoDB connection error:', error);
@@ -148,7 +138,15 @@ mongoose.connect(process.env.MONGODB_URI, {
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
   // Close server & exit process
-  process.exit(1);
+  server.close(() => process.exit(1));
+});
+
+// Handle SIGTERM
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });
 
 module.exports = app;
