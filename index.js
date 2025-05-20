@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
@@ -27,7 +26,9 @@ app.use(helmet({
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173',
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://ahub-deployed.onrender.com', 'https://your-backend-url.onrender.com'] 
+    : 'http://localhost:5173',
   credentials: true,
   optionsSuccessStatus: 200
 };
