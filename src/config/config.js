@@ -1,1 +1,1 @@
-export const backendurl = 'https://ahub-deployed.onrender.com';
+export const backendurl = 'https://ahub-backend-deployed.onrender.com';
