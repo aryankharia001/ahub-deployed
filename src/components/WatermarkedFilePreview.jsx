@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, Eye, Lock, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 
 const WatermarkedFilePreview = ({ jobId, files, isLocked }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -25,7 +25,7 @@ const WatermarkedFilePreview = ({ jobId, files, isLocked }) => {
     setLoading(true);
     
     try {
-      const response = await axios.get(`${backendurl}/api/jobs/${jobId}/preview/${file.id}`, {
+      const response = await axios.get(`${Backendurl}/api/jobs/${jobId}/preview/${file.id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

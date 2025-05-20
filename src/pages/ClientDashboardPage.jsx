@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 import { 
   FileText, 
   DollarSign, 
@@ -88,7 +88,7 @@ const ClientDashboardPage = () => {
       const token = localStorage.getItem('token');
       
       // Include the token in the request headers
-      const response = await axios.delete(`${backendurl}/api/jobs/${jobId}`, {
+      const response = await axios.delete(`${Backendurl}/api/jobs/${jobId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -129,7 +129,7 @@ const handleNoClick = async (jobId) => {
     
     // 2. Then make the API call with proper authorization header
     await axios.put(
-      `${backendurl}/api/jobs/${jobId}/no-revision-required`, 
+      `${Backendurl}/api/jobs/${jobId}/no-revision-required`, 
       { status: 'job_end' },
       {
         headers: {
@@ -162,7 +162,7 @@ const handleNoClick = async (jobId) => {
     const confirmed = window.confirm("Do you want to request revisions for this job?");
     if (!confirmed) return;
     
-    await axios.put(`${backendurl}/api/jobs/${jobId}/revision-required`,
+    await axios.put(`${Backendurl}/api/jobs/${jobId}/revision-required`,
       { status: 'in_progress' },
       {
         headers: {
@@ -224,7 +224,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
     
     // Make API call to submit revision request with proper auth header
     await axios.put(
-      `${backendurl}/api/jobs/${jobId}/request-revision`, 
+      `${Backendurl}/api/jobs/${jobId}/request-revision`, 
       { 
         feedback: feedback,
         status: 'revision_in_progress'
@@ -276,7 +276,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
     
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${selectedJobForReview._id}/client-review`,
+        `${Backendurl}/api/jobs/${selectedJobForReview._id}/client-review`,
         { 
           action: 'request_revision',
           feedback: feedback 
@@ -318,7 +318,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
     
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${selectedJobForReview._id}/client-review`,
+        `${Backendurl}/api/jobs/${selectedJobForReview._id}/client-review`,
         { 
           action: 'approve',
           feedback: feedback || 'Work approved' 
@@ -376,7 +376,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
           params.search = searchQuery;
         }
         
-        const response = await axios.get(`${backendurl}/api/jobs/my/jobs`, {
+        const response = await axios.get(`${Backendurl}/api/jobs/my/jobs`, {
           params,
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`

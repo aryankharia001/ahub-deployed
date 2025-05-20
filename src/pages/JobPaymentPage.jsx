@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 import { 
   DollarSign, 
   CheckCircle, 
@@ -30,7 +30,7 @@ const JobPaymentPage = () => {
     const fetchJobDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${backendurl}/api/jobs/${id}`, {
+        const response = await axios.get(`${Backendurl}/api/jobs/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -81,8 +81,8 @@ const JobPaymentPage = () => {
     
     try {
       const endpoint = paymentType === 'deposit' 
-        ? `${backendurl}/api/jobs/payment/deposit`
-        : `${backendurl}/api/jobs/payment/final`;
+        ? `${Backendurl}/api/jobs/payment/deposit`
+        : `${Backendurl}/api/jobs/payment/final`;
       
       const response = await axios.post(endpoint, {
         jobId: id,

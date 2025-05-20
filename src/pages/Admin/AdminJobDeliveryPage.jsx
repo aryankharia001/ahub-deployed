@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
-import { backendurl } from '../../App';
+import { Backendurl } from '../../App';
 import { 
   FileText, 
   DollarSign, 
@@ -61,7 +61,7 @@ const AdminJobDeliveryPage = () => {
       const fetchJobDetails = async () => {
         try {
           setLoading(true);
-          const response = await axios.get(`${backendurl}/api/jobs/${id}`, {
+          const response = await axios.get(`${Backendurl}/api/jobs/${id}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`
             }

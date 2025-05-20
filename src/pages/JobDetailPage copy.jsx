@@ -17,7 +17,7 @@ import {
   Lock,
   ArrowLeft
 } from 'lucide-react';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 
 import { ThumbsUp, RotateCcw } from 'lucide-react';
@@ -54,7 +54,7 @@ const JobDetailPage = () => {
     
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${id}/client-review`,
+        `${Backendurl}/api/jobs/${id}/client-review`,
         { 
           action: 'request_revision',
           feedback: feedback 
@@ -83,7 +83,7 @@ const JobDetailPage = () => {
     
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${id}/client-review`,
+        `${Backendurl}/api/jobs/${id}/client-review`,
         { 
           action: 'approve',
           feedback: feedback || 'Work approved' 
@@ -161,7 +161,7 @@ const JobDetailPage = () => {
     const fetchJobDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${backendurl}/api/jobs/${id}`, {
+        const response = await axios.get(`${Backendurl}/api/jobs/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }

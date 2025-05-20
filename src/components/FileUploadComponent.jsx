@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, X, File, CheckCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 
 const FileUploadComponent = ({ jobId, onUploadSuccess }) => {
   const [files, setFiles] = useState([]);
@@ -34,7 +34,7 @@ const FileUploadComponent = ({ jobId, onUploadSuccess }) => {
     });
     
     try {
-      const response = await axios.post(`${backendurl}/api/jobs/${jobId}/upload-files`, formData, {
+      const response = await axios.post(`${Backendurl}/api/jobs/${jobId}/upload-files`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`

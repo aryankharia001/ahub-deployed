@@ -1,12 +1,13 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { backendurl } from '../App';
+import { backendurl } from '../config/config';
 
 // Create the Auth Context
 const AuthContext = createContext(null);
 
 // Create axios instance with base URL
 const api = axios.create({
+  // baseURL: `${Backendurl}/api`,
   baseURL: `${backendurl}/api`,
   headers: {
     'Content-Type': 'application/json',

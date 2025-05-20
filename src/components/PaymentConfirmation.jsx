@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DollarSign, CheckCircle, AlertCircle, CreditCard, Shield } from 'lucide-react';
 import axios from 'axios';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 
 const PaymentConfirmation = ({ job, paymentType, onSuccess, onCancel }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -26,8 +26,8 @@ const PaymentConfirmation = ({ job, paymentType, onSuccess, onCancel }) => {
     
     try {
       const endpoint = paymentType === 'deposit' 
-        ? `${backendurl}/api/jobs/payment/deposit` 
-        : `${backendurl}/api/jobs/payment/final`;
+        ? `${Backendurl}/api/jobs/payment/deposit` 
+        : `${Backendurl}/api/jobs/payment/final`;
       
       const response = await axios.post(endpoint, {
         jobId: job._id,

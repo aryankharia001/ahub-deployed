@@ -1,4 +1,7 @@
+
 import React from 'react';
+import { backendurl } from './config/config';
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -14,7 +17,7 @@ import Navbar from './components/Navbar';
 import JobDetailPage from './pages/JobDetailPage';
 import JobPaymentPage from './pages/JobPaymentPage';
 
-export const backendurl = 'https://ahub-deployed.onrender.com';
+export const Backendurl = backendurl;
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {

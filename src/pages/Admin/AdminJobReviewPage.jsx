@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
-import { backendurl } from '../../App';
+import { Backendurl } from '../../App';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 
 const AdminJobReviewPage = () => {
@@ -36,7 +36,7 @@ const AdminJobReviewPage = () => {
     setError(null);
 
     try {
-      const response = await axios.get(`${backendurl}/api/jobs/admin/pending?page=${page}&limit=10`, {
+      const response = await axios.get(`${Backendurl}/api/jobs/admin/pending?page=${page}&limit=10`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -93,7 +93,7 @@ const AdminJobReviewPage = () => {
     
     try {
       const response = await axios.put(
-        `${backendurl}/api/jobs/${selectedJob._id}/review`, 
+        `${Backendurl}/api/jobs/${selectedJob._id}/review`, 
         reviewData,
         {
           headers: {

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
-import { backendurl } from '../../App';
+import { Backendurl } from '../../App';
 import { 
   Briefcase, 
   Calendar, 
@@ -81,7 +81,7 @@ const ContributorDashboardPage = () => {
   const handleStartRevision = async (revisionId) => {
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${jobDetails._id}/revisions/${revisionId}/start`,
+        `${Backendurl}/api/jobs/${jobDetails._id}/revisions/${revisionId}/start`,
         {},
         {
           headers: {
@@ -93,7 +93,7 @@ const ContributorDashboardPage = () => {
       setNotification('You have started working on this revision.');
       
       // Refresh job data
-      const jobsResponse = await axios.get(`${backendurl}/api/jobs/contributor/my-jobs`, {
+      const jobsResponse = await axios.get(`${Backendurl}/api/jobs/contributor/my-jobs`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -122,7 +122,7 @@ const ContributorDashboardPage = () => {
     
     try {
       const response = await axios.post(
-        `${backendurl}/api/jobs/${jobDetails._id}/submit-work`,
+        `${Backendurl}/api/jobs/${jobDetails._id}/submit-work`,
         formData,
         {
           headers: {
@@ -139,7 +139,7 @@ const ContributorDashboardPage = () => {
       setShowRevisionSubmitModal(false);
       
       // Refresh job data
-      const jobsResponse = await axios.get(`${backendurl}/api/jobs/contributor/my-jobs`, {
+      const jobsResponse = await axios.get(`${Backendurl}/api/jobs/contributor/my-jobs`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -170,7 +170,7 @@ const ContributorDashboardPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`${backendurl}/api/jobs/contributor/stats`, {
+        const response = await axios.get(`${Backendurl}/api/jobs/contributor/stats`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -193,7 +193,7 @@ const ContributorDashboardPage = () => {
   
       try {
         // The API endpoint already filters for deposit_paid jobs with no freelancer
-        let endpoint = `${backendurl}/api/jobs/contributor/available`;
+        let endpoint = `${Backendurl}/api/jobs/contributor/available`;
         let params = {
           sortBy,
           sortOrder
@@ -221,7 +221,7 @@ const ContributorDashboardPage = () => {
 
     const fetchMyJobs = async () => {
       try {
-        let endpoint = `${backendurl}/api/jobs/contributor/my-jobs`;
+        let endpoint = `${Backendurl}/api/jobs/contributor/my-jobs`;
         let params = {
           sortBy,
           sortOrder
@@ -272,7 +272,7 @@ const ContributorDashboardPage = () => {
       }
   
       // Make API call to apply for the job
-      const response = await axios.post(`${backendurl}/api/jobs/${jobId}/apply`, {}, {
+      const response = await axios.post(`${Backendurl}/api/jobs/${jobId}/apply`, {}, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -292,7 +292,7 @@ const ContributorDashboardPage = () => {
       setJobDetails(null);
       
       // Refresh stats to update the dashboard numbers
-      const statsResponse = await axios.get(`${backendurl}/api/jobs/contributor/stats`, {
+      const statsResponse = await axios.get(`${Backendurl}/api/jobs/contributor/stats`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -300,7 +300,7 @@ const ContributorDashboardPage = () => {
       setStats(statsResponse.data.data || {});
       
       // Also fetch my jobs to reflect the newly assigned job
-      const myJobsResponse = await axios.get(`${backendurl}/api/jobs/contributor/my-jobs`, {
+      const myJobsResponse = await axios.get(`${Backendurl}/api/jobs/contributor/my-jobs`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -380,7 +380,7 @@ const handleSubmitWork = async (e, jobId) => {
     console.log(`Sending ${selectedFiles.length} files to server for job ID: ${jobId}`);
     
     // Make the API request
-    const response = await axios.post(`${backendurl}/api/jobs/${jobId}/submit-work`, formData, {
+    const response = await axios.post(`${Backendurl}/api/jobs/${jobId}/submit-work`, formData, {
       headers: {
         // Don't set Content-Type when sending FormData - Axios will set it with the boundary
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -409,7 +409,7 @@ const handleSubmitWork = async (e, jobId) => {
     setJobDetails(null);
     
     // Refresh stats from server
-    const statsResponse = await axios.get(`${backendurl}/api/jobs/contributor/stats`, {
+    const statsResponse = await axios.get(`${Backendurl}/api/jobs/contributor/stats`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -439,7 +439,7 @@ const handleSubmitWork = async (e, jobId) => {
     setError(null);
 
     try {
-      const response = await axios.get(`${backendurl}/api/jobs/${jobId}`, {
+      const response = await axios.get(`${Backendurl}/api/jobs/${jobId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -1117,7 +1117,7 @@ const handleSubmitWork = async (e, jobId) => {
   console.log(`Submitting ${selectedFiles.length} files for job: ${jobDetails?._id}`);
   
   // Submit the form data
-  axios.post(`${backendurl}/api/jobs/${jobDetails?._id}/submit-work`, formData, {
+  axios.post(`${Backendurl}/api/jobs/${jobDetails?._id}/submit-work`, formData, {
     headers: {
       // Do NOT set Content-Type here - let Axios set it automatically with boundary
       Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -1146,7 +1146,7 @@ const handleSubmitWork = async (e, jobId) => {
     setJobDetails(null);
     
     // Refresh stats
-    axios.get(`${backendurl}/api/jobs/contributor/stats`, {
+    axios.get(`${Backendurl}/api/jobs/contributor/stats`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

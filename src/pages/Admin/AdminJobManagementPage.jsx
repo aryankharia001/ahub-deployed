@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { backendurl } from '../../App';
+import { Backendurl } from '../../App';
 import { 
   AlertCircle, 
   Check, 
@@ -74,7 +74,7 @@ const statusOptions = [
     setError(null);
 
     try {
-      let endpoint = `${backendurl}/api/jobs/admin/jobs`;
+      let endpoint = `${Backendurl}/api/jobs/admin/jobs`;
       let params = {
         page,
         limit: 10,

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { backendurl } from '../App';
+import { Backendurl } from '../App';
 
 // Animation variants
 const fadeInUpVariant = {
@@ -122,7 +122,7 @@ const PostJobPage = () => {
     setSubmitError(null);
     
     try {
-      const response = await axios.post(`${backendurl}/api/jobs`, payload, {
+      const response = await axios.post(`${Backendurl}/api/jobs`, payload, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
