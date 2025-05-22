@@ -80,7 +80,7 @@ const JobDetailPage = () => {
       const response = await axios.post(
         `${Backendurl}/api/jobs/${id}/client-review`,
         { 
-          action: 'approve',
+          action: 'job_end',
           feedback: feedback || 'Work approved' 
         },
         {
@@ -346,7 +346,7 @@ const JobDetailPage = () => {
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-4">
-          <Link to="/dashboard" className="inline-flex items-center text-indigo-600 hover:text-indigo-800">
+          <Link to="/client-dashboard" className="inline-flex items-center text-indigo-600 hover:text-indigo-800">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Dashboard
           </Link>
@@ -438,7 +438,7 @@ const JobDetailPage = () => {
       <div className="w-full border-t border-gray-300"></div>
     </div>
     <div className="relative flex justify-between">
-      {['pending', 'approved', 'deposit_paid', 'in_progress', 'completed', 'final_paid'].map((status, index) => {
+      {['pending', 'approved', 'deposit_paid', 'in_progress', 'completed'].map((status, index) => {
         // Normalize job.status
         const normalizedStatus = ['revision_requested', 'revision_in_progress', 'revision_completed', 'approved_by_client'].includes(job.status)
           ? 'completed'
@@ -629,14 +629,14 @@ const JobDetailPage = () => {
             {renderClientReviewOptions()}
 
             {/* Final Payment Section - Display this when job is approved by client */}
-            {job.status === 'approved_by_client' && job.client._id === user._id && (
+            {job.status === 'completed' && job.client._id === user._id && (
               <div className="mb-6 bg-green-50 p-4 rounded-lg">
                 <div className="flex items-center mb-2">
                   <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
                   <h3 className="text-lg font-medium text-green-800">Work Approved</h3>
                 </div>
                 <p className="text-green-700 mb-4">
-                  You have approved the work. To receive the unwatermarked files, please complete the final payment.
+                  You have approved the work. To receive the files, please complete the final payment.
                 </p>
                 <button
                   onClick={handleFinalPayment}
@@ -645,6 +645,55 @@ const JobDetailPage = () => {
                   <DollarSign className="mr-1 h-4 w-4" />
                   Make Final Payment
                 </button>
+              </div>
+            )}
+
+            {/* File URL after final payment is done */}
+            {job.status === 'final_paid' && job.client._id === user._id && (
+              <div className="mb-6 bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <Download className="mr-2 h-5 w-5 text-blue-500" />
+                  <h3 className="text-lg font-medium text-blue-800">Files Available</h3>
+                </div>
+                <p className="text-blue-700 mb-4">
+                  Thank you for your payment. Your files are now available for download.
+                </p>
+                
+                {/* Display all deliverable files with download links */}
+                {job.deliverables && job.deliverables.length > 0 ? (
+                  <div className="mt-4 space-y-3">
+                    <h4 className="font-medium text-blue-800">Deliverable Files:</h4>
+                    {job.deliverables.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-white p-3 rounded shadow-sm">
+                        <div className="flex items-center">
+                          {/* <File className="h-4 w-4 text-blue-500 mr-2" /> */}
+                          <span className="text-gray-800">{file.name}</span>
+                        </div>
+                        <div className="flex space-x-2">
+                          <a 
+                            href={file.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-2 py-1 border border-transparent rounded text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200"
+                          >
+                            <Eye className="mr-1 h-3 w-3" />
+                            View
+                          </a>
+                          <a 
+                            href={file.downloadUrl} 
+                            download
+                            className="inline-flex items-center px-2 py-1 border border-transparent rounded text-xs font-medium text-white bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Download className="mr-1 h-3 w-3" />
+                            Download
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No deliverable files found.</p>
+                )}
               </div>
             )}
 
@@ -827,7 +876,7 @@ const JobDetailPage = () => {
           <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
             <div className="flex justify-end space-x-3">
               <Link 
-                to="/dashboard" 
+                to="/client-dashboard" 
                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Back to Dashboard

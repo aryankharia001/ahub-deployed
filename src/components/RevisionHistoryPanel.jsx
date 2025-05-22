@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, CheckCircle, RotateCcw, AlertCircle, Eye, Download } from 'lucide-react';
+import { Clock, CheckCircle, RotateCcw, AlertCircle, Eye, Download, File } from 'lucide-react';
 
 const RevisionHistoryPanel = ({ revisions, jobId }) => {
   const [expandedRevision, setExpandedRevision] = useState(null);
@@ -26,6 +26,8 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
     switch (status) {
       case 'requested':
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case 'pending':
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       case 'in_progress':
         return <RotateCcw className="h-4 w-4 text-blue-500" />;
       case 'completed':
@@ -40,6 +42,8 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
   const getStatusClass = (status) => {
     switch (status) {
       case 'requested':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'in_progress':
         return 'bg-blue-100 text-blue-800';
@@ -56,6 +60,8 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
     switch (status) {
       case 'requested':
         return 'Requested';
+      case 'pending':
+        return 'Pending';
       case 'in_progress':
         return 'In Progress';
       case 'completed':
@@ -63,8 +69,27 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
       case 'approved':
         return 'Approved';
       default:
-        return status;
+        return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ');
     }
+  };
+
+  // Function to determine file icon based on mime type
+  const getFileIcon = (mimeType) => {
+    if (!mimeType) return <File className="h-4 w-4 text-gray-500" />;
+    
+    if (mimeType.includes('image')) {
+      return <img src="/icons/image.svg" alt="Image" className="h-4 w-4" onError={(e) => e.target.src = ""} />;
+    } else if (mimeType.includes('pdf')) {
+      return <img src="/icons/pdf.svg" alt="PDF" className="h-4 w-4" onError={(e) => e.target.src = ""} />;
+    } else if (mimeType.includes('word') || mimeType.includes('msword') || mimeType.includes('document')) {
+      return <img src="/icons/doc.svg" alt="Document" className="h-4 w-4" onError={(e) => e.target.src = ""} />;
+    } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || mimeType.includes('sheet')) {
+      return <img src="/icons/sheet.svg" alt="Spreadsheet" className="h-4 w-4" onError={(e) => e.target.src = ""} />;
+    } else if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) {
+      return <img src="/icons/zip.svg" alt="Archive" className="h-4 w-4" onError={(e) => e.target.src = ""} />;
+    }
+    
+    return <File className="h-4 w-4 text-gray-500" />;
   };
 
   if (!revisions || revisions.length === 0) {
@@ -110,29 +135,32 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
                       <h4 className="text-xs uppercase tracking-wide font-semibold text-gray-500 mb-2">Client Request</h4>
                       <div className="bg-white p-3 rounded border border-gray-200">
                         <p className="text-sm text-gray-700 whitespace-pre-line">
-                          {revision.clientNotes || 'No specific requests provided.'}
+                          {revision.clientNotes || revision.description || revision.feedback || 'No specific requests provided.'}
                         </p>
                       </div>
                     </div>
                     
                     {/* Freelancer Notes (if available) */}
-                    {revision.status === 'completed' && revision.freelancerNotes && (
+                    {(revision.status === 'completed' || revision.status === 'approved') && (revision.freelancerNotes || revision.message) && (
                       <div>
                         <h4 className="text-xs uppercase tracking-wide font-semibold text-gray-500 mb-2">Contributor Response</h4>
                         <div className="bg-white p-3 rounded border border-gray-200">
-                          <p className="text-sm text-gray-700 whitespace-pre-line">{revision.freelancerNotes}</p>
+                          <p className="text-sm text-gray-700 whitespace-pre-line">{revision.freelancerNotes || revision.message}</p>
                         </div>
                       </div>
                     )}
                     
                     {/* Deliverables (if available) */}
-                    {revision.status === 'completed' && revision.deliverables && revision.deliverables.length > 0 && (
+                    {(revision.status === 'completed' || revision.status === 'approved') && revision.deliverables && revision.deliverables.length > 0 && (
                       <div>
                         <h4 className="text-xs uppercase tracking-wide font-semibold text-gray-500 mb-2">Revised Files</h4>
                         <ul className="space-y-2">
                           {revision.deliverables.map((file, fileIndex) => (
                             <li key={fileIndex} className="flex items-center justify-between bg-white p-2 rounded border border-gray-200">
-                              <span className="text-sm text-gray-700">{file.name}</span>
+                              <div className="flex items-center overflow-hidden">
+                                {getFileIcon(file.type)}
+                                <span className="ml-2 text-sm text-gray-700 truncate max-w-xs">{file.name}</span>
+                              </div>
                               <div className="flex space-x-2">
                                 <a 
                                   href={file.url} 
@@ -144,7 +172,7 @@ const RevisionHistoryPanel = ({ revisions, jobId }) => {
                                   View
                                 </a>
                                 <a 
-                                  href={file.url} 
+                                  href={file.downloadUrl || file.url} 
                                   download 
                                   className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200"
                                 >

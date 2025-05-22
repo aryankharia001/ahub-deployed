@@ -17,8 +17,6 @@ import Navbar from './components/Navbar';
 import JobDetailPage from './pages/JobDetailPage';
 import JobPaymentPage from './pages/JobPaymentPage';
 
-
-
 export const Backendurl = backendurl;
 
 // Protected Route Component

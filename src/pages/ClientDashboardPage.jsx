@@ -459,7 +459,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
       case 'deposit_paid': return 'Awaiting Contributor';
       case 'in_progress': return 'In Progress';
       // case 'completed': return 'Completed - Final Payment Required';
-      case 'final_paid': return 'Paid - Work Downloaded';
+      case 'final_paid': return 'Paid - Download Your Work';
       case 'rejected': return 'Rejected';
       case 'completed': return 'Completed - Payment Required';
       case 'revision_requested': return 'Revision Requested';
@@ -738,6 +738,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
             )}
             
             <div className="mt-6 flex justify-end space-x-3">
+             
               <Link to={`/jobs/${selectedJob._id}`}>
                 <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700">
                   View Full Details
@@ -1067,14 +1068,14 @@ const handleSubmitRevisionFeedback = async (jobId) => {
                           </Link>
                         )}
                         
-                        {job.status === 'final_paid' && (
+                        {/* {job.status === 'final_paid' && (
                           <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm transition-all flex items-center">
                             <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                             Download Files
                           </button>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>
@@ -1176,7 +1177,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
                     </div>
                   )}
                   {/* Revision buttons - Only shown for jobs that need revision decision */}
-                  {!showRevisionFeedbackMap[job._id] && job.status === 'final_paid' && job.status !== 'job_end' && (
+                  {/* {!showRevisionFeedbackMap[job._id] && job.status === 'final_paid' && job.status !== 'job_end' && (
                     <div className="mt-6 p-5 bg-blue-50 border border-blue-200 rounded-lg shadow-sm">
                       <div className="flex items-center mb-3">
                         <svg className="h-5 w-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1209,7 +1210,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
                         </button>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </motion.div>
               ))
             )}

@@ -98,7 +98,7 @@ const JobPaymentPage = () => {
       
       // Redirect to dashboard after success
       setTimeout(() => {
-        navigate('/dashboard', { 
+        navigate('/client-dashboard', { 
           state: { 
             notification: response.data.message || 'Payment completed successfully!'
           }
@@ -140,7 +140,7 @@ const JobPaymentPage = () => {
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <Link to="/dashboard" className="inline-flex items-center text-indigo-600 hover:text-indigo-800">
+          <Link to="/client-dashboard" className="inline-flex items-center text-indigo-600 hover:text-indigo-800">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back to Dashboard
           </Link>
@@ -160,7 +160,7 @@ const JobPaymentPage = () => {
             <p>{error}</p>
             <div className="mt-4">
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/client-dashboard')}
                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
               >
                 Back to Dashboard
@@ -229,7 +229,7 @@ const JobPaymentPage = () => {
                     </div>
                   </div>
                   
-                  {paymentType === 'final' && job?.deliverables && job?.deliverables.length > 0 && (
+                  {/* {paymentType === 'final' && job?.deliverables && job?.deliverables.length > 0 && (
                     <div className="mb-8">
                       <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
                         <AlertCircle className="mr-2 h-5 w-5 text-yellow-600" />
@@ -261,7 +261,8 @@ const JobPaymentPage = () => {
                         </ul>
                       </div>
                     </div>
-                  )}
+                  )} */}
+                  
                   
                   {paymentError && (
                     <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -301,7 +302,7 @@ const JobPaymentPage = () => {
                     <div className="flex">
                       <button
                         type="button"
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => navigate('/client-dashboard')}
                         className="mr-4 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50"
                       >
                         Cancel
