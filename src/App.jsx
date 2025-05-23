@@ -16,6 +16,7 @@ import ContributorDashboardPage from './pages/Contributor/ContributorDashboardPa
 import Navbar from './components/Navbar';
 import JobDetailPage from './pages/JobDetailPage';
 import JobPaymentPage from './pages/JobPaymentPage';
+import AdminUserManagementPage from './pages/Admin/AdminUserManagementPage';
 
 export const Backendurl = backendurl;
 
@@ -148,8 +149,19 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          
+
+
+
           {/* Admin Routes */}
+          <Route 
+            path="/admin/users/manage" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <Layout><AdminUserManagementPage /></Layout>
+              </ProtectedRoute>
+            } 
+          />
+          
           <Route 
             path="/admin/jobs/review" 
             element={

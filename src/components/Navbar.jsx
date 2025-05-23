@@ -59,6 +59,10 @@ const Navbar = () => {
         to: "/admin/jobs/review",
         label: "Job Review"
       });
+      menuItems.push({
+        to: "/admin/users/manage",
+        label: "User Management"
+      });
     }
 
     return menuItems;
