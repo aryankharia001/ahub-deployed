@@ -143,7 +143,7 @@ const PostJobPage = () => {
       
       // Redirect to submission confirmation after a short delay
       setTimeout(() => {
-        navigate('/dashboard', { 
+        navigate('/client-dashboard', { 
           state: { 
             notification: 'Job posted successfully! It is now pending admin review.' 
           } 

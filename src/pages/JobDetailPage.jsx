@@ -80,7 +80,7 @@ const JobDetailPage = () => {
       const response = await axios.post(
         `${Backendurl}/api/jobs/${id}/client-review`,
         { 
-          action: 'job_end',
+          action: 'approve',
           feedback: feedback || 'Work approved' 
         },
         {
@@ -649,7 +649,7 @@ const JobDetailPage = () => {
             )}
 
             {/* File URL after final payment is done */}
-            {job.status === 'final_paid' && job.client._id === user._id && (
+            {(job.status === 'final_paid' || job.status === 'job_end') && job.client._id === user._id && (
               <div className="mb-6 bg-blue-50 p-4 rounded-lg">
                 <div className="flex items-center mb-2">
                   <Download className="mr-2 h-5 w-5 text-blue-500" />
@@ -670,7 +670,7 @@ const JobDetailPage = () => {
                           <span className="text-gray-800">{file.name}</span>
                         </div>
                         <div className="flex space-x-2">
-                          <a 
+                          {/* <a 
                             href={file.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
@@ -678,7 +678,7 @@ const JobDetailPage = () => {
                           >
                             <Eye className="mr-1 h-3 w-3" />
                             View
-                          </a>
+                          </a> */}
                           <a 
                             href={file.downloadUrl} 
                             download
@@ -730,7 +730,7 @@ const JobDetailPage = () => {
 
 
             {/* Deliverables Section */}
-            {job.deliverables && job.deliverables.length > 0 && job.status === 'completed' || job.status === 'job_end' && (
+            {/* {job.deliverables && job.deliverables.length > 0 && job.status === 'completed' || job.status === 'job_end' && (
               <div className="mb-6">
                 <div className="flex items-center mb-3">
                   <Download className="mr-2 h-5 w-5 text-gray-400" />
@@ -843,7 +843,7 @@ const JobDetailPage = () => {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Admin Feedback */}
             {job.adminFeedback && (

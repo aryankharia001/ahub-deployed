@@ -25,8 +25,27 @@ const JobPaymentPage = () => {
   const [paymentType, setPaymentType] = useState(null);
   const [amount, setAmount] = useState(0);
   const [paymentError, setPaymentError] = useState(null);
+  const [orderId, setOrderId] = useState(null);
 
   useEffect(() => {
+    // Load Razorpay script
+    const loadRazorpayScript = () => {
+      return new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+          resolve(true);
+        };
+        script.onerror = () => {
+          resolve(false);
+          console.error('Razorpay SDK failed to load');
+        };
+        document.body.appendChild(script);
+      });
+    };
+    
+    loadRazorpayScript();
+    
     const fetchJobDetails = async () => {
       try {
         setLoading(true);
@@ -75,18 +94,17 @@ const JobPaymentPage = () => {
     fetchJobDetails();
   }, [id, user._id]);
 
-  const handleSubmitPayment = async () => {
-    setIsProcessing(true);
-    setPaymentError(null);
-    
+  const createRazorpayOrder = async () => {
     try {
+      setIsProcessing(true);
+      setPaymentError(null);
+      
       const endpoint = paymentType === 'deposit' 
-        ? `${Backendurl}/api/jobs/payment/deposit`
-        : `${Backendurl}/api/jobs/payment/final`;
+        ? `${Backendurl}/api/jobs/payment/deposit/create-order`
+        : `${Backendurl}/api/jobs/payment/final/create-order`;
       
       const response = await axios.post(endpoint, {
-        jobId: id,
-        paymentMethod: 'direct_payment' // In a real app, this would be different payment methods
+        jobId: id
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -94,21 +112,122 @@ const JobPaymentPage = () => {
         }
       });
       
-      setPaymentSuccess(true);
+      return response.data.data.orderId;
+    } catch (err) {
+      console.error('Error creating order:', err);
+      setPaymentError(
+        err.response?.data?.message || 
+        'An error occurred while creating the payment order. Please try again.'
+      );
+      setIsProcessing(false);
+      return null;
+    }
+  };
+
+  const handleSubmitPayment = async () => {
+    try {
+      const orderId = await createRazorpayOrder();
       
-      // Redirect to dashboard after success
-      setTimeout(() => {
-        navigate('/client-dashboard', { 
-          state: { 
-            notification: response.data.message || 'Payment completed successfully!'
+      if (!orderId) {
+        return; // Error already handled in createRazorpayOrder
+      }
+      
+      setOrderId(orderId);
+      
+      // Use the amount returned from the server response 
+      // This ensures we're using the exact amount (in paise) that Razorpay expects
+      const paymentAmount = Math.round(getPaymentAmount() * 100); // Convert to paise
+      
+      const options = {
+        key: "rzp_test_jEjmIhF6m9wEKw" || "rzp_test_jEjmIhF6m9wEKw", // Replace with your key
+        amount: paymentAmount, // Amount in paise
+        currency: "INR",
+        name: "AHub Services",
+        description: paymentType === 'deposit' 
+          ? `Deposit Payment for Job: ${job.title}` 
+          : `Final Payment for Job: ${job.title}`,
+        order_id: orderId,
+        handler: function (response) {
+          handlePaymentSuccess(response);
+        },
+        prefill: {
+          name: user.name || "",
+          email: user.email || "",
+          contact: user.phone || ""
+        },
+        notes: {
+          jobId: id,
+          paymentType: paymentType
+        },
+        theme: {
+          color: "#4F46E5"
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
           }
-        });
-      }, 3000);
+        },
+        // Add image if you have a logo
+        // image: "https://your-logo-url.png",
+      };
+      
+      const razorpayInstance = new window.Razorpay(options);
+      razorpayInstance.on('payment.failed', function (response) {
+        setPaymentError(response.error.description || 'Payment failed. Please try again.');
+        setIsProcessing(false);
+      });
+      
+      razorpayInstance.open();
     } catch (err) {
       console.error('Payment processing error:', err);
       setPaymentError(
         err.response?.data?.message || 
         'An error occurred while processing your payment. Please try again.'
+      );
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePaymentSuccess = async (response) => {
+    try {
+      const verifyPaymentData = {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        paymentType: paymentType
+      };
+      
+      const verifyResponse = await axios.post(
+        `${Backendurl}/api/jobs/payment/verify`,
+        verifyPaymentData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      
+      if (verifyResponse.data.success) {
+        setPaymentSuccess(true);
+        
+        // Redirect to dashboard after success
+        setTimeout(() => {
+          navigate('/client-dashboard', { 
+            state: { 
+              notification: verifyResponse.data.message || 'Payment completed successfully!'
+            }
+          });
+        }, 3000);
+      } else {
+        setPaymentError('Payment verification failed. Please contact support.');
+        setIsProcessing(false);
+      }
+    } catch (err) {
+      console.error('Payment verification error:', err);
+      setPaymentError(
+        err.response?.data?.message || 
+        'An error occurred while verifying your payment. Please contact support.'
       );
       setIsProcessing(false);
     }
@@ -181,7 +300,7 @@ const JobPaymentPage = () => {
                     : 'Your final payment has been processed. You can now access the unwatermarked deliverables.'}
                 </p>
                 <div className="mt-6 text-green-700 font-medium">
-                  <p>Amount Paid: ${formatCurrency(getPaymentAmount())}</p>
+                  <p>Amount Paid: ₹{formatCurrency(getPaymentAmount())}</p>
                   <p>Reference: #{job._id.substring(0, 8)}</p>
                 </div>
                 <p className="mt-6 text-sm text-gray-500">Redirecting you to the dashboard...</p>
@@ -207,62 +326,27 @@ const JobPaymentPage = () => {
                       </div>
                       <div className="flex justify-between mb-2">
                         <span className="text-gray-600">Total Job Price:</span>
-                        <span className="font-medium">${formatCurrency(job?.price)}</span>
+                        <span className="font-medium">₹{formatCurrency(job?.price)}</span>
                       </div>
                       {paymentType === 'deposit' ? (
                         <div className="flex justify-between font-bold text-lg text-indigo-700 mt-4 pt-2 border-t border-gray-200">
                           <span>Deposit Amount (50%):</span>
-                          <span>${formatCurrency(getPaymentAmount())}</span>
+                          <span>₹{formatCurrency(getPaymentAmount())}</span>
                         </div>
                       ) : (
                         <>
                           <div className="flex justify-between mb-2">
                             <span className="text-gray-600">Deposit Paid:</span>
-                            <span className="font-medium">-${formatCurrency(job?.depositAmount || job?.price / 2)}</span>
+                            <span className="font-medium">-₹{formatCurrency(job?.depositAmount || job?.price / 2)}</span>
                           </div>
                           <div className="flex justify-between font-bold text-lg text-indigo-700 mt-4 pt-2 border-t border-gray-200">
                             <span>Remaining Balance:</span>
-                            <span>${formatCurrency(getPaymentAmount())}</span>
+                            <span>₹{formatCurrency(getPaymentAmount())}</span>
                           </div>
                         </>
                       )}
                     </div>
                   </div>
-                  
-                  {/* {paymentType === 'final' && job?.deliverables && job?.deliverables.length > 0 && (
-                    <div className="mb-8">
-                      <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
-                        <AlertCircle className="mr-2 h-5 w-5 text-yellow-600" />
-                        Preview of Deliverables (Watermarked)
-                      </h3>
-                      <div className="bg-yellow-50 p-4 rounded-lg">
-                        <p className="text-sm text-yellow-700 mb-3">
-                          After completing payment, you'll receive access to the unwatermarked versions of these files:
-                        </p>
-                        <ul className="space-y-2">
-                          {job.deliverables.map((item, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="mr-2 text-yellow-500">•</span>
-                              <a 
-                                href={item.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-blue-600 hover:underline"
-                              >
-                                {item.name} <span className="text-xs text-gray-500">({item.type})</span>
-                              </a>
-                              {item.isWatermarked && (
-                                <span className="ml-2 bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded-full">
-                                  Watermarked
-                                </span>
-                              )}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )} */}
-                  
                   
                   {paymentError && (
                     <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -283,10 +367,10 @@ const JobPaymentPage = () => {
                         <Lock className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm text-blue-800 font-medium">Secure Development Payment</p>
+                        <p className="text-sm text-blue-800 font-medium">Secure Payment with Razorpay</p>
                         <p className="text-sm text-blue-700 mt-1">
-                          This is a development version with simplified payment. In production,
-                          this would connect to a payment processor like Stripe or PayPal.
+                          Your payment information is securely processed through Razorpay,
+                          India's trusted payment gateway.
                         </p>
                       </div>
                     </div>
@@ -324,7 +408,7 @@ const JobPaymentPage = () => {
                         ) : (
                           <div className="flex items-center">
                             <CreditCard className="mr-2 h-5 w-5" />
-                            Pay ${formatCurrency(getPaymentAmount())}
+                            Pay ₹{formatCurrency(getPaymentAmount())}
                           </div>
                         )}
                       </button>

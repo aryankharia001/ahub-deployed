@@ -321,7 +321,7 @@ const handleSubmitRevisionFeedback = async (jobId) => {
         `${Backendurl}/api/jobs/${selectedJobForReview._id}/client-review`,
         { 
           action: 'approve',
-          feedback: feedback || 'Work approved' 
+          feedback: feedback || 'Work approvedddd' 
         },
         {
           headers: {
@@ -330,6 +330,8 @@ const handleSubmitRevisionFeedback = async (jobId) => {
           }
         }
       );
+
+      console.log("response.data.data : ", response.data.data);
       
       setNotification('Work approved successfully. You can now proceed to make the final payment.');
       setShowApprovalModal(false);
@@ -1226,12 +1228,12 @@ const handleSubmitRevisionFeedback = async (jobId) => {
         revisionsRemaining={selectedJobForReview?.revisionsRemaining || 0}
       />
 
-      <ApprovalModal 
+      {/* <ApprovalModal 
         isOpen={showApprovalModal}
         onClose={() => setShowApprovalModal(false)}
         onSubmit={handleApproveWork}
         isSubmitting={isSubmitting}
-      />
+      /> */}
     </motion.div>
   );
 };
